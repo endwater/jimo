@@ -20,6 +20,7 @@ wp_max_ad_count           type int64,
 d_empty                   type string
 )
 FIELDS TERMINATED BY "|"
+FIELDS TERMINATED BY "|"
 ENCLOSED BY "NULL"
 LINES TERMINATED BY "LF";
 
@@ -39,3 +40,16 @@ create dataset file web_page_dataset
             ),
     splitter:(
                 block_size:10000
+            )
+);
+
+create dataproc load_data web_page_doc
+(
+    input:web_page_dataset,
+    table:web_page_table
+);
+
+end;
+
+run job web_page_job(threadnum:6,processnum:3);
+
