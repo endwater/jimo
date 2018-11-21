@@ -39,3 +39,15 @@ create dataset file ship_mode_dataset
     splitter:(
                 block_size:10000
             )
+);
+
+create dataproc load_data ship_mode_doc
+(
+    input:ship_mode_dataset,
+    table:ship_mode_table
+);
+
+end;
+
+run job ship_mode_job(threadnum:6,processnum:3);
+
