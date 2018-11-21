@@ -39,3 +39,32 @@ FIELDS(
         cs_net_paid_inc_ship     number(10,2),
         cs_net_paid_inc_ship_tax number(10,2),
         cs_net_profit            number(10,2),
+)
+FIELDS TERMINATED BY "|"
+ENCLOSED BY "NULL"
+LINES TERMINATED BY "LF";
+
+create dataset file catalog_sales_dataset
+(
+    schema:catalog_sales_schema,
+    files:(
+            (filename:"/tpcds/data100G/catalog_sales.dat",serverid:0)
+            ),
+    splitter:(
+                block_size:10000
+            )
+);
+
+
+create hyper table if not exists catalog_sales using catalog_sales_schema;
+
+
+create job catalog_sales_job(1)
+begin
+create dataproc load_data catalog_sales_doc
+(
+    input:catalog_sales_dataset,
+    table:catalog_sales
+);
+end;
+run job catalog_sales_job(threadnum:6,processnum:3);
