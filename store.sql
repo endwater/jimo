@@ -39,3 +39,58 @@ ENCLOSED BY "NULL"
 LINES TERMINATED BY "LF";
 
 create table if not exists store_table using store_schema;
+
+create map if not exists store_map_s_store_name on store_table
+KEY (s_store_sk)
+VALUE (s_store_name);
+
+create map if not exists store_map_s_city on store_table
+KEY (s_store_sk)
+VALUE (s_city);
+
+create map if not exists store_map_s_county on store_table
+KEY (s_store_sk)
+VALUE (s_county);
+
+create map if not exists store_map_s_zip on store_table
+KEY (s_store_sk)
+VALUE (s_zip);
+
+create map if not exists store_map_s_state on store_table
+KEY (s_store_sk)
+VALUE (s_state);
+
+create map if not exists store_map_s_country on store_table
+KEY (s_store_sk)
+VALUE (s_country);
+
+create map if not exists store_map_s_gmt_offset on store_table
+KEY (s_store_sk)
+VALUE (s_gmt_offset);
+
+create map if not exists store_map_s_market_id on store_table
+KEY (s_store_sk)
+VALUE (s_market_id);
+
+create job store_job(2)
+begin
+create dataset file store_dataset
+(
+    schema:store_schema,
+    files:(
+            (filename:"/tpcds/data1G/store.dat",serverid:0)
+            ),
+    splitter:(
+                block_size:10000
+            )
+);
+
+create dataproc load_data store_doc
+(
+    input:store_dataset,
+    table:store_table
+);
+
+end;
+
+run job store_job(threadnum:6,processnum:3);
