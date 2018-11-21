@@ -39,3 +39,29 @@ VALUE (c_current_hdemo_sk);
 
 create map if not exists customer_map_c_current_addr_sk on customer_table
 KEY (c_customer_sk)
+VALUE (c_current_addr_sk);
+
+create job customer_job(2)
+begin
+create dataset file customer_dataset
+(
+    schema:customer_schema,
+    files:(
+            (filename:"/tpcds/data1G/customer.dat", serverid:0)
+            ),
+    splitter:(
+                block_size:10000
+            )
+);
+
+create dataproc load_data customer_doc
+(
+    input:customer_dataset,
+    table:customer_table
+);
+
+end;
+
+run job customer_job(threadnum:6,processnum:3);
+
+
